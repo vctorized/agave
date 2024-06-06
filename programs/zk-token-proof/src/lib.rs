@@ -4,7 +4,7 @@ use {
     bytemuck::Pod,
     solana_program_runtime::{declare_process_instruction, ic_msg, invoke_context::InvokeContext},
     solana_sdk::{
-        feature_set,
+        // feature_set,
         instruction::{InstructionError, TRANSACTION_LEVEL_STACK_HEIGHT},
         system_program,
     },
@@ -31,6 +31,8 @@ pub const VERIFY_CIPHERTEXT_COMMITMENT_EQUALITY_COMPUTE_UNITS: u64 = 6_400;
 pub const VERIFY_GROUPED_CIPHERTEXT_2_HANDLES_VALIDITY_COMPUTE_UNITS: u64 = 6_400;
 pub const VERIFY_BATCHED_GROUPED_CIPHERTEXT_2_HANDLES_VALIDITY_COMPUTE_UNITS: u64 = 13_000;
 pub const VERIFY_FEE_SIGMA_COMPUTE_UNITS: u64 = 6_500;
+pub const VERIFY_GROUPED_CIPHERTEXT_3_HANDLES_VALIDITY_COMPUTE_UNITS: u64 = 8_100;
+pub const VERIFY_BATCHED_GROUPED_CIPHERTEXT_3_HANDLES_VALIDITY_COMPUTE_UNITS: u64 = 16_400;
 
 const INSTRUCTION_DATA_LENGTH_WITH_PROOF_ACCOUNT: usize = 5;
 
@@ -48,12 +50,12 @@ where
 
     // if instruction data is exactly 5 bytes, then read proof from an account
     let context_data = if instruction_data.len() == INSTRUCTION_DATA_LENGTH_WITH_PROOF_ACCOUNT {
-        if !invoke_context
-            .feature_set
-            .is_active(&feature_set::enable_zk_proof_from_account::id())
-        {
-            return Err(InstructionError::InvalidInstructionData);
-        }
+        // if !invoke_context
+        //     .get_feature_set()
+        //     .is_active(&feature_set::enable_zk_proof_from_account::id())
+        // {
+        //     return Err(InstructionError::InvalidInstructionData);
+        // }
 
         let proof_data_account = instruction_context
             .try_borrow_instruction_account(transaction_context, accessed_accounts)?;
@@ -181,9 +183,9 @@ fn process_close_proof_context(invoke_context: &mut InvokeContext) -> Result<(),
 }
 
 declare_process_instruction!(Entrypoint, 0, |invoke_context| {
-    let enable_zk_transfer_with_fee = invoke_context
-        .feature_set
-        .is_active(&feature_set::enable_zk_transfer_with_fee::id());
+    // let enable_zk_transfer_with_fee = invoke_context
+    //     .get_feature_set()
+    //     .is_active(&feature_set::enable_zk_transfer_with_fee::id());
 
     let transaction_context = &invoke_context.transaction_context;
     let instruction_context = transaction_context.get_current_instruction_context()?;
@@ -239,9 +241,9 @@ declare_process_instruction!(Entrypoint, 0, |invoke_context| {
         }
         ProofInstruction::VerifyTransferWithFee => {
             // transfer with fee related proofs are not enabled
-            if !enable_zk_transfer_with_fee {
-                return Err(InstructionError::InvalidInstructionData);
-            }
+            // if !enable_zk_transfer_with_fee {
+            //     return Err(InstructionError::InvalidInstructionData);
+            // }
 
             invoke_context
                 .consume_checked(VERIFY_TRANSFER_WITH_FEE_COMPUTE_UNITS)
@@ -283,9 +285,9 @@ declare_process_instruction!(Entrypoint, 0, |invoke_context| {
         }
         ProofInstruction::VerifyBatchedRangeProofU256 => {
             // transfer with fee related proofs are not enabled
-            if !enable_zk_transfer_with_fee {
-                return Err(InstructionError::InvalidInstructionData);
-            }
+            // if !enable_zk_transfer_with_fee {
+            //     return Err(InstructionError::InvalidInstructionData);
+            // }
 
             invoke_context
                 .consume_checked(VERIFY_BATCHED_RANGE_PROOF_U256_COMPUTE_UNITS)
@@ -330,15 +332,38 @@ declare_process_instruction!(Entrypoint, 0, |invoke_context| {
         }
         ProofInstruction::VerifyFeeSigma => {
             // transfer with fee related proofs are not enabled
-            if !enable_zk_transfer_with_fee {
-                return Err(InstructionError::InvalidInstructionData);
-            }
+            // if !enable_zk_transfer_with_fee {
+            //     return Err(InstructionError::InvalidInstructionData);
+            // }
 
             invoke_context
                 .consume_checked(VERIFY_FEE_SIGMA_COMPUTE_UNITS)
                 .map_err(|_| InstructionError::ComputationalBudgetExceeded)?;
             ic_msg!(invoke_context, "VerifyFeeSigma");
             process_verify_proof::<FeeSigmaProofData, FeeSigmaProofContext>(invoke_context)
+        }
+        ProofInstruction::VerifyGroupedCiphertext3HandlesValidity => {
+            invoke_context
+                .consume_checked(VERIFY_GROUPED_CIPHERTEXT_3_HANDLES_VALIDITY_COMPUTE_UNITS)
+                .map_err(|_| InstructionError::ComputationalBudgetExceeded)?;
+            ic_msg!(invoke_context, "VerifyGroupedCiphertext3HandlesValidity");
+            process_verify_proof::<
+                GroupedCiphertext3HandlesValidityProofData,
+                GroupedCiphertext3HandlesValidityProofContext,
+            >(invoke_context)
+        }
+        ProofInstruction::VerifyBatchedGroupedCiphertext3HandlesValidity => {
+            invoke_context
+                .consume_checked(VERIFY_BATCHED_GROUPED_CIPHERTEXT_3_HANDLES_VALIDITY_COMPUTE_UNITS)
+                .map_err(|_| InstructionError::ComputationalBudgetExceeded)?;
+            ic_msg!(
+                invoke_context,
+                "VerifyBatchedGroupedCiphertext3HandlesValidity"
+            );
+            process_verify_proof::<
+                BatchedGroupedCiphertext3HandlesValidityProofData,
+                BatchedGroupedCiphertext3HandlesValidityProofContext,
+            >(invoke_context)
         }
     }
 });
