@@ -162,7 +162,7 @@ bs58 = "0.4.0"
 bv = "0.11.1"
 byte-unit = "4.0.19"
 bytecount = "0.6.7"
-bytemuck = "1.14.0"
+bytemuck = "=1.15.0"
 byteorder = "1.5.0"
 bytes = "1.5"
 bzip2 = "0.4.4"
@@ -388,14 +388,22 @@ solana-zk-keygen = { path = "zk-keygen", version = "=1.18.15" }
 solana-zk-token-proof-program = { path = "programs/zk-token-proof", version = "=1.18.15" }
 solana-zk-token-sdk = { path = "zk-token-sdk", version = "=1.18.15" }
 solana_rbpf = "=0.8.0"
-spl-associated-token-account = "=2.3.0"
-spl-instruction-padding = "0.1"
-spl-memo = "=4.0.0"
-spl-pod = "=0.1.0"
-spl-token = "=4.0.0"
-spl-token-2022 = "=1.0.0"
-spl-token-group-interface = "=0.1.0"
-spl-token-metadata-interface = "=0.2.0"
+# spl-associated-token-account = "=2.3.0"
+# spl-instruction-padding = "0.1"
+# spl-memo = "=4.0.0"
+# spl-pod = "=0.1.0"
+# spl-token = "=4.0.0"
+# spl-token-2022 = "=1.0.0"
+# spl-token-group-interface = "=0.1.0"
+# spl-token-metadata-interface = "=0.2.0"
+spl-associated-token-account = { git = "https://github.com/vctorized/solana-program-library", branch = "edit1" }
+spl-instruction-padding = { git = "https://github.com/vctorized/solana-program-library", branch = "edit1" }
+spl-memo = { git = "https://github.com/vctorized/solana-program-library", branch = "edit1" }
+spl-pod = { git = "https://github.com/vctorized/solana-program-library", branch = "edit1" }
+spl-token = { git = "https://github.com/vctorized/solana-program-library", branch = "edit1" }
+spl-token-2022 = { git = "https://github.com/vctorized/solana-program-library", branch = "edit1" }
+spl-token-group-interface = { git = "https://github.com/vctorized/solana-program-library", branch = "edit1" }
+spl-token-metadata-interface = { git = "https://github.com/vctorized/solana-program-library", branch = "edit1" }
 static_assertions = "1.1.0"
 stream-cancel = "0.8.2"
 strum = "0.24"
